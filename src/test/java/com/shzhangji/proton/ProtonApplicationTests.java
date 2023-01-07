@@ -1,10 +1,10 @@
-package com.shzhangji.quark;
+package com.shzhangji.proton;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class QuarkApplicationTests {
+class ProtonApplicationTests {
 
 	@Test
 	void contextLoads() {

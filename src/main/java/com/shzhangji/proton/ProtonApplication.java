@@ -1,13 +1,11 @@
-package com.shzhangji.quark;
+package com.shzhangji.proton;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class QuarkApplication {
-
+public class ProtonApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(QuarkApplication.class, args);
+		SpringApplication.run(ProtonApplication.class, args);
 	}
-
 }
