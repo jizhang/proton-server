@@ -5,10 +5,14 @@ import com.shzhangji.proton.entity.User;
 import com.shzhangji.proton.form.LoginForm;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,10 +23,19 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
+@DependsOn("securityFilterChain")
 public class AuthController {
+  private final RememberMeServices rememberMeServices;
+
   @PostMapping("/login")
   public CurrentUser login(@Valid @RequestBody LoginForm form, BindingResult bindingResult,
-                           HttpServletRequest request) {
+                           HttpServletRequest request, HttpServletResponse response) {
+
+    if (request.getUserPrincipal() != null) {
+      throw new AppException("Please logout first.");
+    }
+
     if (bindingResult.hasErrors()) {
       throw new AppException("Invalid username or password");
     }
@@ -37,6 +50,7 @@ public class AuthController {
     var user = (User) auth.getPrincipal();
     log.info("User {} logged in.", user.getUsername());
 
+    rememberMeServices.loginSuccess(request, response, auth);
     return new CurrentUser(user.getId(), user.getNickname());
   }
 
