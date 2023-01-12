@@ -40,10 +40,17 @@ public class AuthController {
     return new CurrentUser(user.getId(), user.getNickname());
   }
 
+  @PostMapping("/logout")
+  public LogoutResponse logout(HttpServletRequest request) throws ServletException {
+    request.logout();
+    return new LogoutResponse();
+  }
+
   @GetMapping("/current-user")
   public CurrentUser getCurrentUser(@AuthenticationPrincipal User user) {
     return new CurrentUser(user.getId(), user.getNickname());
   }
 
-  public record CurrentUser(Integer id, String nickname) { }
+  public record CurrentUser(Integer id, String nickname) {}
+  public record LogoutResponse() {}
 }
