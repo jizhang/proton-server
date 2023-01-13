@@ -13,6 +13,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,6 +66,13 @@ public class AuthController {
     return new CurrentUser(user.getId(), user.getNickname());
   }
 
+  @GetMapping("/csrf")
+  public CsrfResponse csrf(HttpServletRequest request) {
+    var csrf = (CsrfToken) request.getAttribute("_csrf");
+    return new CsrfResponse(csrf.getToken());
+  }
+
   public record CurrentUser(Integer id, String nickname) {}
   public record LogoutResponse() {}
+  public record CsrfResponse(String token) {}
 }

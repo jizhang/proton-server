@@ -24,13 +24,13 @@ public class ProtonApplication {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     var chain = http
         .authorizeHttpRequests(customizer -> customizer
+            .requestMatchers("/api/csrf").permitAll()
             .requestMatchers("/api/login").permitAll()
             .requestMatchers("/api/**").authenticated()
             .anyRequest().denyAll())
         .exceptionHandling(customizer -> customizer
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
         .rememberMe(customizer -> customizer.alwaysRemember(true).key("proton"))
-        .csrf(customizer -> customizer.disable())
         .build();
 
     var rememberMeServices = http.getSharedObject(RememberMeServices.class);
