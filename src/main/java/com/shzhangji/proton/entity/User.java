@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import lombok.Data;
+import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
+@Table
 public class User implements UserDetails {
   private Integer id;
   private String username;
