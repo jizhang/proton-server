@@ -13,9 +13,9 @@ import org.springframework.security.web.authentication.RememberMeServices;
 
 @SpringBootApplication
 public class ProtonApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(ProtonApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(ProtonApplication.class, args);
+  }
 
   @Autowired
   private ConfigurableBeanFactory beanFactory;

@@ -73,6 +73,8 @@ public class AuthController {
   }
 
   public record CurrentUser(Integer id, String nickname) {}
+
   public record LogoutResponse() {}
+
   public record CsrfResponse(String token) {}
 }
