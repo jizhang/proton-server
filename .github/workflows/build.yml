@@ -2,8 +2,13 @@ name: Build
 
 on: push
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  JAR_FILE: proton-0.1.0-SNAPSHOT.jar
+
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -19,7 +24,7 @@ jobs:
           --health-timeout=5s
           --health-retries=5
       redis:
-        image: redis
+        image: redis:6
         ports:
           - 6379:6379
         options: >-
@@ -35,3 +40,36 @@ jobs:
           distribution: temurin
           cache: maven
       - run: mvn --batch-mode verify
+      - uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/master'
+        with:
+          name: jar
+          path: target/${{ env.JAR_FILE }}
+          retention-days: 5
+
+  build:
+    if: github.ref == 'refs/heads/master'
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: jar
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/metadata-action@v4
+        id: meta
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=sha
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            JAR_FILE=${{ env.JAR_FILE }}
