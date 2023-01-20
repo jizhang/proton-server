@@ -41,14 +41,14 @@ jobs:
           cache: maven
       - run: mvn --batch-mode verify
       - uses: actions/upload-artifact@v3
-        # if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         with:
           name: jar
           path: target/${{ env.JAR_FILE }}
           retention-days: 5
 
   build:
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     needs: verify
     runs-on: ubuntu-latest
     steps:
