@@ -1,5 +1,7 @@
 package com.shzhangji.proton.controller;
 
+import com.shzhangji.proton.service.DashboardService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -11,11 +13,14 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 @RestController
 @RequestMapping("/api/dashboard")
+@RequiredArgsConstructor
 public class DashboardController {
+  private final DashboardService dashboardService;
+
   @Value("classpath:geo-china.json")
   private Resource geoChinaResource;
 
-  @GetMapping(value = "/geoChina")
+  @GetMapping("/geoChina")
   public ResponseEntity<StreamingResponseBody> getGeoChina() {
     return ResponseEntity.ok()
         .contentType(MediaType.APPLICATION_JSON)
@@ -24,5 +29,10 @@ public class DashboardController {
             in.transferTo(out);
           }
         });
+  }
+
+  @GetMapping("/activeUser")
+  public DashboardService.ActiveUserData getActiveUser() {
+    return dashboardService.getActiveUser();
   }
 }
