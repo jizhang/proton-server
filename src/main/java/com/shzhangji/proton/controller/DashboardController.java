@@ -35,4 +35,9 @@ public class DashboardController {
   public DashboardService.ActiveUserData getActiveUser() {
     return dashboardService.getActiveUser();
   }
+
+  @GetMapping("/primaryData")
+  public DashboardService.PrimaryData getPrimaryData() {
+    return dashboardService.getPrimaryData();
+  }
 }

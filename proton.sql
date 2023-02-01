@@ -23,3 +23,12 @@ CREATE TABLE da_user_count_rt (
     ,user_count_15min BIGINT NOT NULL DEFAULT 0
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE da_user_primary_daily (
+    report_date INT NOT NULL PRIMARY KEY
+    ,user_count BIGINT NOT NULL DEFAULT 0
+    ,session_count BIGINT NOT NULL DEFAULT 0
+    ,single_page_user_count BIGINT NOT NULL DEFAULT 0
+    ,total_session_seconds BIGINT NOT NULL DEFAULT 0
+    ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
