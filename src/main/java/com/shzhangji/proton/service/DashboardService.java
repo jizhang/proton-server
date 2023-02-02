@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,39 +44,61 @@ public class DashboardService {
     return new ActiveUserData(count, minutes);
   }
 
-  public PrimaryData getPrimaryData() {
+  public PrimaryData getPrimaryData(int days) {
     var endDate = LocalDate.now().minusDays(1);
-    var startDate = endDate.minusDays(27);
+    var startDate = endDate.minusDays(days * 2 - 1);
     var data = userPrimaryRepo.getUserPrimaryData(startDate, endDate);
     var dataMap = new HashMap<LocalDate, UserPrimaryDaily>();
     for (var item : data) {
       dataMap.put(item.getReportDate(), item);
     }
 
-    var currentDate = endDate.minusDays(13);
-    var dataArr = new PrimaryMeasureData[14];
+    var users = new PrimaryMeasure("users", "Users", "integer",
+        generateMeasureData(endDate, days, dataMap, UserPrimaryDaily::getUserCount));
+    var sessions = new PrimaryMeasure("session", "Session", "integer",
+        generateMeasureData(endDate, days, dataMap, UserPrimaryDaily::getSessionCount));
+    var bounceRate = new PrimaryMeasure("bounce_rate", "Bounce Rate", "percent",
+        generateMeasureData(endDate, days, dataMap, UserPrimaryDaily::getBounceRate));
+    var sessionDuration = new PrimaryMeasure("session_duration", "Session Duration", "interval",
+        generateMeasureData(endDate, days, dataMap, UserPrimaryDaily::getSessionDuration));
+
+    return new PrimaryData(new PrimaryMeasure[] { users, sessions, bounceRate, sessionDuration });
+  }
+
+  private PrimaryMeasureData[] generateMeasureData(
+      LocalDate endDate,
+      int days,
+      Map<LocalDate, UserPrimaryDaily> dataMap,
+      Function<UserPrimaryDaily, Number> getter) {
+
+    var currentDate = endDate.minusDays(days - 1);
+    var dataArr = new PrimaryMeasureData[days];
     var dfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    for (int i = 0; i < 14; ++i) {
-      long current = 0;
-      long previous = 0;
+    for (int i = 0; i < days; ++i) {
+      Number current = null;
+      Number previous = null;
 
       var currentItem = dataMap.get(currentDate);
       if (currentItem != null) {
-        current = currentItem.getUserCount();
+        current = getter.apply(currentItem);
       }
 
-      var previousItem = dataMap.get(currentDate.minusDays(14));
+      var previousDate = currentDate.minusDays(days);
+      var previousItem = dataMap.get(previousDate);
       if (previousItem != null) {
-        previous = previousItem.getUserCount();
+        previous = getter.apply(previousItem);
       }
 
-      dataArr[i] = new PrimaryMeasureData(currentDate.format(dfDate), current, previous);
+      dataArr[i] = new PrimaryMeasureData(
+          currentDate.format(dfDate),
+          current,
+          previous,
+          previousDate.format(dfDate));
 
       currentDate = currentDate.plusDays(1);
     }
 
-    var users = new PrimaryMeasure("users", "Users", "integer", dataArr);
-    return new PrimaryData(new PrimaryMeasure[] { users });
+    return dataArr;
   }
 
   public record ActiveUserData(long count, long[] minutes) {}
@@ -88,5 +112,10 @@ public class DashboardService {
       PrimaryMeasureData[] data
   ) {}
 
-  public record PrimaryMeasureData(String date, Number current, Number previous) {}
+  public record PrimaryMeasureData(
+      String date,
+      Number current,
+      Number previous,
+      String previousDate
+  ) {}
 }

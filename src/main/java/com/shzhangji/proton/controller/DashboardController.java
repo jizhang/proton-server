@@ -38,6 +38,6 @@ public class DashboardController {
 
   @GetMapping("/primaryData")
   public DashboardService.PrimaryData getPrimaryData() {
-    return dashboardService.getPrimaryData();
+    return dashboardService.getPrimaryData(14);
   }
 }
