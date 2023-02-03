@@ -5,6 +5,7 @@ import com.shzhangji.proton.entity.UserPrimaryDaily;
 import com.shzhangji.proton.repository.UserCount1minRepository;
 import com.shzhangji.proton.repository.UserCountRtRepository;
 import com.shzhangji.proton.repository.UserPrimaryRepository;
+import com.shzhangji.proton.repository.UserSourceDailyRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,9 +19,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
+  private static final DateTimeFormatter DF_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
   private final UserCountRtRepository userCountRtRepo;
   private final UserCount1minRepository userCount1minRepo;
   private final UserPrimaryRepository userPrimaryRepo;
+  private final UserSourceDailyRepository userSourceRepo;
 
   public ActiveUserData getActiveUser() {
     var now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
@@ -43,6 +47,8 @@ public class DashboardService {
 
     return new ActiveUserData(count, minutes);
   }
+
+  public record ActiveUserData(long count, long[] minutes) {}
 
   public PrimaryData getPrimaryData(int days) {
     var endDate = LocalDate.now().minusDays(1);
@@ -73,7 +79,6 @@ public class DashboardService {
 
     var currentDate = endDate.minusDays(days - 1);
     var dataArr = new PrimaryMeasureData[days];
-    var dfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     for (int i = 0; i < days; ++i) {
       Number current = null;
       Number previous = null;
@@ -90,18 +95,16 @@ public class DashboardService {
       }
 
       dataArr[i] = new PrimaryMeasureData(
-          currentDate.format(dfDate),
+          currentDate.format(DF_DATE),
           current,
           previous,
-          previousDate.format(dfDate));
+          previousDate.format(DF_DATE));
 
       currentDate = currentDate.plusDays(1);
     }
 
     return dataArr;
   }
-
-  public record ActiveUserData(long count, long[] minutes) {}
 
   public record PrimaryData(PrimaryMeasure[] measures) {}
 
@@ -118,4 +121,40 @@ public class DashboardService {
       Number previous,
       String previousDate
   ) {}
+
+  public SourceData getUserSource(int days) {
+    var endDate = LocalDate.now().minusDays(1);
+    var startDate = endDate.minusDays(days - 1);
+    var trafficChannelData = userSourceRepo.getChannelData(startDate, endDate).stream()
+        .map(item -> new SourceMeasureData(
+            item.getReportDate().format(DF_DATE),
+            item.getChannel(),
+            item.getUserCount()))
+        .toArray(SourceMeasureData[]::new);
+    var trafficChannel = new SourceMeasure("traffic_channel", "Traffic Channel", trafficChannelData);
+
+    var sourceMediumData = userSourceRepo.getSourceMediumData(startDate, endDate).stream()
+        .map(item -> new SourceMeasureData(
+            item.getReportDate().format(DF_DATE),
+            String.format("%s / %s", item.getSource(), item.getMedium()),
+            item.getUserCount()))
+        .toArray(SourceMeasureData[]::new);
+    var sourceMedium = new SourceMeasure("source_medium", "Source / Medium", sourceMediumData);
+
+    var referralsData = userSourceRepo.getReferralData(startDate, endDate).stream()
+        .map(item -> new SourceMeasureData(
+            item.getReportDate().format(DF_DATE),
+            item.getReferral(),
+            item.getUserCount()))
+        .toArray(SourceMeasureData[]::new);
+    var referrals = new SourceMeasure("referrals", "Referrals", referralsData);
+
+    return new SourceData(new SourceMeasure[] { trafficChannel, sourceMedium, referrals });
+  }
+
+  public record SourceData(SourceMeasure[] measures) {}
+
+  public record SourceMeasure(String name, String label, SourceMeasureData[] data) {}
+
+  public record SourceMeasureData(String date, String key, Long value) {}
 }

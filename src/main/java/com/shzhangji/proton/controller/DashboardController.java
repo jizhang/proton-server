@@ -40,4 +40,9 @@ public class DashboardController {
   public DashboardService.PrimaryData getPrimaryData() {
     return dashboardService.getPrimaryData(14);
   }
+
+  @GetMapping("/userSource")
+  public DashboardService.SourceData getUserSource() {
+    return dashboardService.getUserSource(7);
+  }
 }
