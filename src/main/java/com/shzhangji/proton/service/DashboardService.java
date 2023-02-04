@@ -4,6 +4,7 @@ import com.shzhangji.proton.entity.UserCountRt;
 import com.shzhangji.proton.entity.UserPrimaryDaily;
 import com.shzhangji.proton.repository.UserCount1minRepository;
 import com.shzhangji.proton.repository.UserCountRtRepository;
+import com.shzhangji.proton.repository.UserGeoDailyRepository;
 import com.shzhangji.proton.repository.UserPrimaryRepository;
 import com.shzhangji.proton.repository.UserSourceDailyRepository;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class DashboardService {
   private final UserCount1minRepository userCount1minRepo;
   private final UserPrimaryRepository userPrimaryRepo;
   private final UserSourceDailyRepository userSourceRepo;
+  private final UserGeoDailyRepository userGeoRepo;
 
   public ActiveUserData getActiveUser() {
     var now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
@@ -157,4 +159,17 @@ public class DashboardService {
   public record SourceMeasure(String name, String label, SourceMeasureData[] data) {}
 
   public record SourceMeasureData(String date, String key, Long value) {}
+
+  public UserGeoData getUserGeo() {
+    var province = userGeoRepo.getUserGeoDaily(LocalDate.now().minusDays(1)).stream()
+        .map(row -> new ProvinceData(
+            row.getProvince(),
+            row.getUserCount()))
+        .toArray(ProvinceData[]::new);
+    return new UserGeoData(province);
+  }
+
+  public record UserGeoData(ProvinceData[] province) {}
+
+  public record ProvinceData(String name, Long value) {}
 }

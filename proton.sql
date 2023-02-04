@@ -32,3 +32,22 @@ CREATE TABLE da_user_primary_daily (
     ,total_session_seconds BIGINT NOT NULL DEFAULT 0
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE da_user_source_daily (
+    report_date INT NOT NULL
+    ,source VARCHAR(255) NOT NULL
+    ,medium VARCHAR(255) NOT NULL
+    ,channel VARCHAR(255) NOT NULL
+    ,user_count BIGINT NOT NULL DEFAULT 0
+    ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ,PRIMARY KEY (report_date, source, medium)
+    ,INDEX idx_medium (medium, report_date)
+);
+
+CREATE TABLE da_user_geo_daily (
+    report_date INT NOT NULL
+    ,province VARCHAR(255) NOT NULL
+    ,user_count BIGINT NOT NULL DEFAULT 0
+    ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ,PRIMARY KEY (report_date, province)
+);

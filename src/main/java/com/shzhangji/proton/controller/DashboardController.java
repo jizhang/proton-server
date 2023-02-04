@@ -45,4 +45,9 @@ public class DashboardController {
   public DashboardService.SourceData getUserSource() {
     return dashboardService.getUserSource(7);
   }
+
+  @GetMapping("/userGeo")
+  public DashboardService.UserGeoData getUserGeo() {
+    return dashboardService.getUserGeo();
+  }
 }
