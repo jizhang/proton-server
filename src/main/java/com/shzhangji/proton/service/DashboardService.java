@@ -1,8 +1,11 @@
 package com.shzhangji.proton.service;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.shzhangji.proton.entity.UserCountRt;
 import com.shzhangji.proton.entity.UserPrimaryDaily;
 import com.shzhangji.proton.repository.UserCount1minRepository;
+import com.shzhangji.proton.repository.UserCountHourlyRepository;
 import com.shzhangji.proton.repository.UserCountRtRepository;
 import com.shzhangji.proton.repository.UserGeoDailyRepository;
 import com.shzhangji.proton.repository.UserPrimaryRepository;
@@ -27,6 +30,7 @@ public class DashboardService {
   private final UserPrimaryRepository userPrimaryRepo;
   private final UserSourceDailyRepository userSourceRepo;
   private final UserGeoDailyRepository userGeoRepo;
+  private final UserCountHourlyRepository userHourlyRepo;
 
   public ActiveUserData getActiveUser() {
     var now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
@@ -172,4 +176,18 @@ public class DashboardService {
   public record UserGeoData(ProvinceData[] province) {}
 
   public record ProvinceData(String name, Long value) {}
+
+  public UserHourlyData[] getUserHourly() {
+    var startDate = LocalDateTime.now().minusDays(7).truncatedTo(ChronoUnit.DAYS);
+    var endDate = startDate.plusHours(7 * 24 - 1);
+    var df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+    return userHourlyRepo.findByReportHourBetween(startDate, endDate).stream()
+        .map(row -> new UserHourlyData(
+            row.getReportHour().format(df),
+            row.getUserCount()))
+        .toArray(UserHourlyData[]::new);
+  }
+
+  @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+  public record UserHourlyData(String reportHour, long userCount) {}
 }

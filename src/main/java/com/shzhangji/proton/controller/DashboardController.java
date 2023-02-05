@@ -50,4 +50,11 @@ public class DashboardController {
   public DashboardService.UserGeoData getUserGeo() {
     return dashboardService.getUserGeo();
   }
+
+  @GetMapping("/activeHourlyUsers")
+  public UserHourlyResponse getUserHourly() {
+    return new UserHourlyResponse(dashboardService.getUserHourly());
+  }
+
+  public record UserHourlyResponse(DashboardService.UserHourlyData[] data) {}
 }
