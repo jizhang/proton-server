@@ -7,6 +7,7 @@ import com.shzhangji.proton.entity.UserPrimaryDaily;
 import com.shzhangji.proton.repository.UserCount1minRepository;
 import com.shzhangji.proton.repository.UserCountHourlyRepository;
 import com.shzhangji.proton.repository.UserCountRtRepository;
+import com.shzhangji.proton.repository.UserDeviceDailyRepository;
 import com.shzhangji.proton.repository.UserGeoDailyRepository;
 import com.shzhangji.proton.repository.UserPrimaryRepository;
 import com.shzhangji.proton.repository.UserSourceDailyRepository;
@@ -15,8 +16,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,7 @@ public class DashboardService {
   private final UserSourceDailyRepository userSourceRepo;
   private final UserGeoDailyRepository userGeoRepo;
   private final UserCountHourlyRepository userHourlyRepo;
+  private final UserDeviceDailyRepository userDeviceRepo;
 
   public ActiveUserData getActiveUser() {
     var now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
@@ -190,4 +194,30 @@ public class DashboardService {
 
   @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
   public record UserHourlyData(String reportHour, long userCount) {}
+
+  public DeviceData[] getUserDevice() {
+    var currentDate = LocalDate.now().minusDays(1);
+    var previousDate = currentDate.minusDays(7);
+    var data = userDeviceRepo.findByDates(List.of(currentDate, previousDate));
+
+    var deviceMap = new HashMap<String, DeviceData>();
+    for (var item : data) {
+      var device = deviceMap.computeIfAbsent(item.getDeviceName(), DeviceData::new);
+      if (item.getReportDate().equals(currentDate)) {
+        device.current = item.getUserCount();
+      } else if (item.getReportDate().equals(previousDate)) {
+        device.previous = item.getUserCount();
+      }
+    }
+
+    return deviceMap.values().toArray(DeviceData[]::new);
+  }
+
+  @Data
+  @RequiredArgsConstructor
+  public static class DeviceData {
+    private final String name;
+    private Long current;
+    private Long previous;
+  }
 }

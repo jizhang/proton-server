@@ -57,3 +57,11 @@ CREATE TABLE da_user_count_hourly (
     ,user_count BIGINT NOT NULL DEFAULT 0
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE da_user_device_daily (
+    report_date INT NOT NULL
+    ,device_name VARCHAR(255) NOT NULL
+    ,user_count BIGINT NOT NULL DEFAULT 0
+    ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ,PRIMARY KEY (report_date, device_name)
+);

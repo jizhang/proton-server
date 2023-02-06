@@ -57,4 +57,11 @@ public class DashboardController {
   }
 
   public record UserHourlyResponse(DashboardService.UserHourlyData[] data) {}
+
+  @GetMapping("/userDevice")
+  public UserDeviceResponse getUserDevice() {
+    return new UserDeviceResponse(dashboardService.getUserDevice());
+  }
+
+  public record UserDeviceResponse(DashboardService.DeviceData[] devices) {}
 }
