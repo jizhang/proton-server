@@ -64,4 +64,11 @@ public class DashboardController {
   }
 
   public record UserDeviceResponse(DashboardService.DeviceData[] devices) {}
+
+  @GetMapping("/userRetention")
+  public UserRetentionResponse getUserRetention() {
+    return new UserRetentionResponse(dashboardService.getUserRetention());
+  }
+
+  public record UserRetentionResponse(DashboardService.RetentionData[] retention) {}
 }

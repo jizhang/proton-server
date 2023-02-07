@@ -10,7 +10,10 @@ import com.shzhangji.proton.repository.UserCountRtRepository;
 import com.shzhangji.proton.repository.UserDeviceDailyRepository;
 import com.shzhangji.proton.repository.UserGeoDailyRepository;
 import com.shzhangji.proton.repository.UserPrimaryRepository;
+import com.shzhangji.proton.repository.UserRetentionWeeklyRepository;
 import com.shzhangji.proton.repository.UserSourceDailyRepository;
+import com.shzhangji.proton.util.DateUtil;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +38,7 @@ public class DashboardService {
   private final UserGeoDailyRepository userGeoRepo;
   private final UserCountHourlyRepository userHourlyRepo;
   private final UserDeviceDailyRepository userDeviceRepo;
+  private final UserRetentionWeeklyRepository userRetentionRepo;
 
   public ActiveUserData getActiveUser() {
     var now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
@@ -220,4 +224,30 @@ public class DashboardService {
     private Long current;
     private Long previous;
   }
+
+  public RetentionData[] getUserRetention() {
+    var endDate = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+    var startDate = endDate.minusWeeks(5);
+    var data = userRetentionRepo.findByReportWeekBetweenOrderByReportWeek(
+        DateUtil.toInt(startDate), DateUtil.toInt(endDate));
+
+    var df = DateTimeFormatter.ofPattern("M.d");
+    return data.stream()
+        .map(row -> {
+          var date = DateUtil.fromInt(row.getReportWeek());
+          var week = String.format("%s ~ %s", df.format(date), df.format(date.plusDays(6)));
+          var ratios = new double[] {
+              row.getUserCount() / (double) row.getUserCount(),
+              row.getUserCount1w() / (double) row.getUserCount(),
+              row.getUserCount2w() / (double) row.getUserCount(),
+              row.getUserCount3w() / (double) row.getUserCount(),
+              row.getUserCount4w() / (double) row.getUserCount(),
+              row.getUserCount5w() / (double) row.getUserCount(),
+          };
+          return new RetentionData(week, ratios);
+        })
+        .toArray(RetentionData[]::new);
+  }
+
+  public record RetentionData(String week, double[] data) {}
 }

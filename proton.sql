@@ -65,3 +65,14 @@ CREATE TABLE da_user_device_daily (
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ,PRIMARY KEY (report_date, device_name)
 );
+
+CREATE TABLE da_user_retention_weekly (
+    report_week INT NOT NULL PRIMARY KEY
+    ,user_count BIGINT NOT NULL DEFAULT 0
+    ,user_count_1w BIGINT NOT NULL DEFAULT 0
+    ,user_count_2w BIGINT NOT NULL DEFAULT 0
+    ,user_count_3w BIGINT NOT NULL DEFAULT 0
+    ,user_count_4w BIGINT NOT NULL DEFAULT 0
+    ,user_count_5w BIGINT NOT NULL DEFAULT 0
+    ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
