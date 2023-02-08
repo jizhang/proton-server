@@ -24,6 +24,7 @@ public class ProtonApplication {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     var chain = http
         .authorizeHttpRequests(customizer -> customizer
+            .requestMatchers("/error").permitAll()
             .requestMatchers("/api/csrf").permitAll()
             .requestMatchers("/api/login").permitAll()
             .requestMatchers("/api/**").authenticated()
