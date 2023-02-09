@@ -1,4 +1,4 @@
-CREATE TABLE user (
+CREATE TABLE IF NOT EXISTS user (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT
     ,username VARCHAR(255) NOT NULL
     ,password VARCHAR(255) NOT NULL
@@ -8,15 +8,13 @@ CREATE TABLE user (
     ,UNIQUE KEY uk_username (username)
 );
 
-INSERT INTO user VALUES (1, 'admin', '{bcrypt}$2a$10$f4aQLof9kgM8mzJIP7a.Vuc3WYcQK8brcL6hrHdCdkzTH8AppEpOm', 'Jerry', NOW(), NOW());
-
-CREATE TABLE da_user_count_1min (
+CREATE TABLE IF NOT EXISTS da_user_count_1min (
     report_minute DATETIME NOT NULL PRIMARY KEY
     ,user_count BIGINT NOT NULL DEFAULT 0
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE da_user_count_rt (
+CREATE TABLE IF NOT EXISTS da_user_count_rt (
     report_minute DATETIME NOT NULL PRIMARY KEY
     ,user_count_1min BIGINT NOT NULL DEFAULT 0
     ,user_count_5min BIGINT NOT NULL DEFAULT 0
@@ -24,7 +22,7 @@ CREATE TABLE da_user_count_rt (
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE da_user_primary_daily (
+CREATE TABLE IF NOT EXISTS da_user_primary_daily (
     report_date INT NOT NULL PRIMARY KEY
     ,user_count BIGINT NOT NULL DEFAULT 0
     ,session_count BIGINT NOT NULL DEFAULT 0
@@ -33,7 +31,7 @@ CREATE TABLE da_user_primary_daily (
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE da_user_source_daily (
+CREATE TABLE IF NOT EXISTS da_user_source_daily (
     report_date INT NOT NULL
     ,source VARCHAR(255) NOT NULL
     ,medium VARCHAR(255) NOT NULL
@@ -44,7 +42,7 @@ CREATE TABLE da_user_source_daily (
     ,INDEX idx_medium (medium, report_date)
 );
 
-CREATE TABLE da_user_geo_daily (
+CREATE TABLE IF NOT EXISTS da_user_geo_daily (
     report_date INT NOT NULL
     ,province VARCHAR(255) NOT NULL
     ,user_count BIGINT NOT NULL DEFAULT 0
@@ -52,13 +50,13 @@ CREATE TABLE da_user_geo_daily (
     ,PRIMARY KEY (report_date, province)
 );
 
-CREATE TABLE da_user_count_hourly (
+CREATE TABLE IF NOT EXISTS da_user_count_hourly (
     report_hour DATETIME NOT NULL PRIMARY KEY
     ,user_count BIGINT NOT NULL DEFAULT 0
     ,updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE da_user_device_daily (
+CREATE TABLE IF NOT EXISTS da_user_device_daily (
     report_date INT NOT NULL
     ,device_name VARCHAR(255) NOT NULL
     ,user_count BIGINT NOT NULL DEFAULT 0
@@ -66,7 +64,7 @@ CREATE TABLE da_user_device_daily (
     ,PRIMARY KEY (report_date, device_name)
 );
 
-CREATE TABLE da_user_retention_weekly (
+CREATE TABLE IF NOT EXISTS da_user_retention_weekly (
     report_week INT NOT NULL PRIMARY KEY
     ,user_count BIGINT NOT NULL DEFAULT 0
     ,user_count_1w BIGINT NOT NULL DEFAULT 0
