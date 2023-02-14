@@ -7,3 +7,8 @@
     * Config the plugin to use checkstyle version 10.2
     * Activate the Google Checks configuration.
 * Go to Settings / Editor / Code Style, create a new code style scheme, and import `google_checks_10.2.xml`
+
+## OpenAPI
+
+* http://localhost:8080/swagger-ui/index.html
+* http://localhost:8080/v3/api-docs

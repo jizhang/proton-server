@@ -24,11 +24,9 @@ public class ProtonApplication {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     var chain = http
         .authorizeHttpRequests(customizer -> customizer
-            .requestMatchers("/error").permitAll()
-            .requestMatchers("/api/csrf").permitAll()
-            .requestMatchers("/api/login").permitAll()
-            .requestMatchers("/api/**").authenticated()
-            .anyRequest().denyAll())
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+            .requestMatchers("/api/login", "/api/csrf", "/error").permitAll()
+            .requestMatchers("/api/**").authenticated())
         .exceptionHandling(customizer -> customizer
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
         .rememberMe(customizer -> customizer.alwaysRemember(true).key("proton"))
