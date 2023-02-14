@@ -3,6 +3,8 @@ package com.shzhangji.proton.controller;
 import com.shzhangji.proton.AppException;
 import com.shzhangji.proton.entity.User;
 import com.shzhangji.proton.form.LoginForm;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Tag(name = "auth", description = "User authentication")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
   private final RememberMeServices rememberMeServices;
 
+  @Operation(summary = "Login user")
   @PostMapping("/login")
   public CurrentUser login(@Valid @RequestBody LoginForm form, BindingResult bindingResult,
                            HttpServletRequest request, HttpServletResponse response) {
@@ -55,17 +59,20 @@ public class AuthController {
     return new CurrentUser(user.getId(), user.getNickname());
   }
 
+  @Operation(summary = "Logout user")
   @PostMapping("/logout")
   public LogoutResponse logout(HttpServletRequest request) throws ServletException {
     request.logout();
     return new LogoutResponse();
   }
 
+  @Operation(summary = "Get current logged-in user")
   @GetMapping("/current-user")
   public CurrentUser getCurrentUser(@AuthenticationPrincipal User user) {
     return new CurrentUser(user.getId(), user.getNickname());
   }
 
+  @Operation(summary = "Get CSRF token")
   @GetMapping("/csrf")
   public CsrfResponse csrf(HttpServletRequest request) {
     var csrf = (CsrfToken) request.getAttribute("_csrf");
