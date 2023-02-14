@@ -1,6 +1,8 @@
 package com.shzhangji.proton.controller;
 
 import com.shzhangji.proton.service.DashboardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+@Tag(name = "dashboard", description = "Dashboard data")
 @RestController
 @RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public class DashboardController {
   @Value("classpath:geo-china.json")
   private Resource geoChinaResource;
 
+  @Operation(summary = "Get geospatial data of China")
   @GetMapping("/geoChina")
   public ResponseEntity<StreamingResponseBody> getGeoChina() {
     return ResponseEntity.ok()

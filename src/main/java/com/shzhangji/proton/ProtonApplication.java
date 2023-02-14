@@ -1,5 +1,8 @@
 package com.shzhangji.proton;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import java.lang.annotation.Inherited;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -11,6 +14,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Proton",
+        version = "0.1.0",
+        description = "A GA-like dashboard."
+    )
+)
 @SpringBootApplication
 public class ProtonApplication {
   public static void main(String[] args) {
@@ -24,11 +34,9 @@ public class ProtonApplication {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     var chain = http
         .authorizeHttpRequests(customizer -> customizer
-            .requestMatchers("/error").permitAll()
-            .requestMatchers("/api/csrf").permitAll()
-            .requestMatchers("/api/login").permitAll()
-            .requestMatchers("/api/**").authenticated()
-            .anyRequest().denyAll())
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
+            .requestMatchers("/api/login", "/api/csrf", "/error").permitAll()
+            .requestMatchers("/api/**").authenticated())
         .exceptionHandling(customizer -> customizer
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
         .rememberMe(customizer -> customizer.alwaysRemember(true).key("proton"))
