@@ -6,6 +6,7 @@ import com.shzhangji.proton.form.LoginForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -74,8 +75,11 @@ public class AuthController {
 
   @Operation(summary = "Get CSRF token")
   @GetMapping("/csrf")
-  public CsrfResponse csrf(HttpServletRequest request) {
+  public CsrfResponse csrf(HttpServletRequest request, HttpServletResponse response) {
     var csrf = (CsrfToken) request.getAttribute("_csrf");
+    var cookie = new Cookie("CSRF-TOKEN", csrf.getToken());
+    cookie.setPath("/");
+    response.addCookie(cookie);
     return new CsrfResponse(csrf.getToken());
   }
 
