@@ -1,7 +1,10 @@
 package com.shzhangji.proton;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import java.lang.annotation.Inherited;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -20,6 +23,12 @@ import org.springframework.security.web.authentication.RememberMeServices;
         version = "0.1.0",
         description = "A GA-like dashboard."
     )
+)
+@SecurityScheme(
+    name = "CSRF",
+    type = SecuritySchemeType.APIKEY,
+    in = SecuritySchemeIn.HEADER,
+    paramName = "X-CSRF-TOKEN"
 )
 @SpringBootApplication
 public class ProtonApplication {

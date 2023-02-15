@@ -4,9 +4,9 @@ import com.shzhangji.proton.AppException;
 import com.shzhangji.proton.entity.User;
 import com.shzhangji.proton.form.LoginForm;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -34,6 +34,7 @@ public class AuthController {
   private final RememberMeServices rememberMeServices;
 
   @Operation(summary = "Login user")
+  @SecurityRequirement(name = "CSRF")
   @PostMapping("/login")
   public CurrentUser login(@Valid @RequestBody LoginForm form, BindingResult bindingResult,
                            HttpServletRequest request, HttpServletResponse response) {
@@ -61,6 +62,7 @@ public class AuthController {
   }
 
   @Operation(summary = "Logout user")
+  @SecurityRequirement(name = "CSRF")
   @PostMapping("/logout")
   public LogoutResponse logout(HttpServletRequest request) throws ServletException {
     request.logout();
@@ -75,11 +77,8 @@ public class AuthController {
 
   @Operation(summary = "Get CSRF token")
   @GetMapping("/csrf")
-  public CsrfResponse csrf(HttpServletRequest request, HttpServletResponse response) {
+  public CsrfResponse csrf(HttpServletRequest request) {
     var csrf = (CsrfToken) request.getAttribute("_csrf");
-    var cookie = new Cookie("CSRF-TOKEN", csrf.getToken());
-    cookie.setPath("/");
-    response.addCookie(cookie);
     return new CsrfResponse(csrf.getToken());
   }
 
