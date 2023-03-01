@@ -145,7 +145,8 @@ public class DashboardService {
             item.getChannel(),
             item.getUserCount()))
         .toArray(SourceMeasureData[]::new);
-    var trafficChannel = new SourceMeasure("traffic_channel", "Traffic Channel", trafficChannelData);
+    var trafficChannel = new SourceMeasure(
+        "traffic_channel", "Traffic Channel", trafficChannelData);
 
     var sourceMediumData = userSourceRepo.getSourceMediumData(startDate, endDate).stream()
         .map(item -> new SourceMeasureData(
